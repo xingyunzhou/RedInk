@@ -1,0 +1,30 @@
+name: Test Docker Login
+
+on:
+  workflow_dispatch:  # 手动触发
+
+jobs:
+  test-login:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test Docker Hub Login
+        env:
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: |
+          # 测试 secret 是否存在
+          if [ -z "$DOCKER_PASSWORD" ]; then
+            echo "❌ DOCKER_PASSWORD secret is not set!"
+            exit 1
+          else
+            echo "✅ DOCKER_PASSWORD secret is set"
+          fi
+          
+          # 尝试登录
+          echo "$DOCKER_PASSWORD" | docker login -u histonemax --password-stdin
+          
+          if [ $? -eq 0 ]; then
+            echo "✅ Docker Hub login successful!"
+          else
+            echo "❌ Docker Hub login failed!"
+            exit 1
+          fi
